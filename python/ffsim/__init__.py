@@ -81,6 +81,12 @@ from ffsim.protocols import (
     linear_operator,
     trace,
 )
+from ffsim.serialization import (
+    from_json,
+    from_json_dict,
+    to_json,
+    to_json_dict,
+)
 from ffsim.states import (
     BitstringType,
     ProductStateSum,
@@ -205,6 +211,8 @@ __all__ = [
     "fermi_hubbard_1d",
     "fermi_hubbard_2d",
     "fermion_operator",
+    "from_json",
+    "from_json_dict",
     "hartree_fock_state",
     "init_cache",
     "linalg",
@@ -239,6 +247,8 @@ __all__ = [
     "spinful_to_spinless_vec",
     "strings_to_addresses",
     "testing",
+    "to_json",
+    "to_json_dict",
     "trace",
     "transition_rdms",
     "uccsd_generator_restricted",

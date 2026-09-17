@@ -22,6 +22,7 @@ import numpy as np
 import scipy.linalg
 from pyscf.fci.spin_op import contract_ss
 
+from ffsim.serialization import _register_serializable
 from ffsim.states.bitstring import (
     BitstringType,
     addresses_to_strings,
@@ -32,6 +33,7 @@ from ffsim.states.bitstring import (
 from ffsim.states.dimensions import dim
 
 
+@_register_serializable(name="ffsim.StateVector")
 @dataclass
 class StateVector:
     """A state vector in the FCI representation."""

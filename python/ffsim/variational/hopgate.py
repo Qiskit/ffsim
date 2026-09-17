@@ -23,8 +23,10 @@ import numpy as np
 from ffsim import protocols
 from ffsim.gates import apply_hop_gate, apply_orbital_rotation
 from ffsim.linalg.util import unitary_from_parameters, unitary_to_parameters
+from ffsim.serialization import _register_serializable
 
 
+@_register_serializable(name="ffsim.HopGateAnsatzOperator")
 @dataclass(frozen=True)
 class HopGateAnsatzOperator(
     protocols.SupportsApplyUnitary, protocols.SupportsApproximateEquality

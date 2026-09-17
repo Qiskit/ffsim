@@ -20,6 +20,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from ffsim import gates, protocols
+from ffsim.serialization import _register_serializable
 
 
 def _validate_interaction_pairs(
@@ -40,6 +41,7 @@ def _validate_interaction_pairs(
                 )
 
 
+@_register_serializable(name="ffsim.NumNumAnsatzOpSpinBalanced")
 @dataclass(frozen=True)
 class NumNumAnsatzOpSpinBalanced(
     protocols.SupportsApplyUnitary, protocols.SupportsApproximateEquality
