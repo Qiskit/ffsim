@@ -23,9 +23,11 @@ from ffsim import _cistring, protocols
 from ffsim.contract.diag_coulomb import diag_coulomb_linop
 from ffsim.contract.num_op_sum import num_op_sum_linop
 from ffsim.operators import FermionOperator, cre_a, cre_b, des_a, des_b
+from ffsim.serialization import _register_serializable
 from ffsim.states.dimensions import dim
 
 
+@_register_serializable(name="ffsim.DiagonalCoulombHamiltonian")
 @dataclasses.dataclass(frozen=True)
 class DiagonalCoulombHamiltonian(
     protocols.SupportsApproximateEquality,

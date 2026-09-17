@@ -25,8 +25,10 @@ from scipy.linalg.lapack import zrot
 
 from ffsim import linalg, protocols
 from ffsim.gates import apply_orbital_rotation
+from ffsim.serialization import _register_serializable
 
 
+@_register_serializable(name="ffsim.GivensAnsatzOp")
 @dataclass(frozen=True)
 class GivensAnsatzOp(
     protocols.SupportsApplyUnitary, protocols.SupportsApproximateEquality

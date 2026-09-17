@@ -26,7 +26,6 @@ dependencies = [
     "jax",
     "numpy",
     "opt_einsum",
-    "orjson",
     "pyscf>=2.15",
     "scipy",
 ]

@@ -161,8 +161,8 @@ def test_json_closed_shell(tmp_path: pathlib.Path):
     mol_data.dmrg_energy = 1.2345
 
     for compression in [None, "gzip", "bz2", "lzma"]:
-        mol_data.to_json(tmp_path / "test.json", compression=compression)
-        loaded_mol_data = ffsim.MolecularData.from_json(
+        ffsim.to_json(mol_data, tmp_path / "test.json", compression=compression)
+        loaded_mol_data = ffsim.from_json(
             tmp_path / "test.json", compression=compression
         )
         _assert_mol_data_equal(loaded_mol_data, mol_data)
@@ -192,8 +192,8 @@ def test_json_open_shell(tmp_path: pathlib.Path):
     mol_data.run_fci(store_fci_vec=True)
 
     for compression in [None, "gzip", "bz2", "lzma"]:
-        mol_data.to_json(tmp_path / "test.json", compression=compression)
-        loaded_mol_data = ffsim.MolecularData.from_json(
+        ffsim.to_json(mol_data, tmp_path / "test.json", compression=compression)
+        loaded_mol_data = ffsim.from_json(
             tmp_path / "test.json", compression=compression
         )
         _assert_mol_data_equal(loaded_mol_data, mol_data)
@@ -212,8 +212,27 @@ def test_json_atom(tmp_path: pathlib.Path):
     mol_data = ffsim.MolecularData.from_scf(scf, active_space=active_space)
 
     for compression in [None, "gzip", "bz2", "lzma"]:
-        mol_data.to_json(tmp_path / "test.json", compression=compression)
-        loaded_mol_data = ffsim.MolecularData.from_json(
+        ffsim.to_json(mol_data, tmp_path / "test.json", compression=compression)
+        loaded_mol_data = ffsim.from_json(
+            tmp_path / "test.json", compression=compression
+        )
+        _assert_mol_data_equal(loaded_mol_data, mol_data)
+
+
+def test_json_basis_dict(tmp_path: pathlib.Path):
+    """Test saving to and loading from JSON with a per-element basis."""
+    mol = pyscf.gto.Mole()
+    mol.build(
+        atom="""O 0 0 0; H  0 1 0; H 0 0 1""",
+        basis={"O": "sto-6g", "H": "sto-3g"},
+    )
+    scf = pyscf.scf.RHF(mol).run()
+    mol_data = ffsim.MolecularData.from_scf(scf)
+    assert mol_data.basis == {"O": "sto-6g", "H": "sto-3g"}
+
+    for compression in [None, "gzip", "bz2", "lzma"]:
+        ffsim.to_json(mol_data, tmp_path / "test.json", compression=compression)
+        loaded_mol_data = ffsim.from_json(
             tmp_path / "test.json", compression=compression
         )
         _assert_mol_data_equal(loaded_mol_data, mol_data)
