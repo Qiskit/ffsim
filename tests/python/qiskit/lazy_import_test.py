@@ -1,3 +1,5 @@
+# This code is a Qiskit project.
+#
 # (C) Copyright IBM 2026.
 #
 # This code is licensed under the Apache License, Version 2.0. You may
