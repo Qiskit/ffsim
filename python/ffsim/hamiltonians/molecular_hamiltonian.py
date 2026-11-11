@@ -50,6 +50,13 @@ class MolecularHamiltonian(
 
     Here :math:`h_{pq}` is called the one-body tensor and :math:`h_{pqrs}` is called
     the two-body tensor.
+
+    The two-body tensor is assumed to be symmetric under exchange of its index pairs,
+    :math:`h_{pqrs} = h_{rspq}`. If the tensors are real, they are further assumed to
+    satisfy :math:`h_{pq} = h_{qp}` and :math:`h_{pqrs} = h_{qprs} = h_{pqsr}`, the
+    symmetries of integrals over real orbitals. These assumptions are not checked, and
+    the linear operator and diagonal of the Hamiltonian may be incorrect if they don't
+    hold. See :func:`ffsim.contract.two_body_linop`.
     """
 
     one_body_tensor: np.ndarray
@@ -302,6 +309,12 @@ class MolecularHamiltonianSpinless(
     Here :math:`h_{pq}` is called the one-body tensor and :math:`h_{pqrs}` is called
     the two-body tensor.
 
+    The two-body tensor is assumed to be symmetric under exchange of its index pairs,
+    :math:`h_{pqrs} = h_{rspq}`. If the tensors are real, they are further assumed to
+    satisfy :math:`h_{pq} = h_{qp}` and :math:`h_{pqrs} = h_{qprs} = h_{pqsr}`, the
+    symmetries of integrals over real orbitals. These assumptions are not checked, and
+    the linear operator and diagonal of the Hamiltonian may be incorrect if they don't
+    hold. See :func:`ffsim.contract.two_body_linop`.
     """
 
     one_body_tensor: np.ndarray

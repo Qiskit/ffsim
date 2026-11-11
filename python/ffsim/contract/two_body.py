@@ -57,6 +57,17 @@ def two_body_linop(
 
     where :math:`h_{pqrs}` is a tensor of complex coefficients.
 
+    The two-body tensor is assumed to be symmetric under exchange of its index pairs,
+    :math:`h_{pqrs} = h_{rspq}`. If the tensors are real, they are further assumed to
+    have the symmetries of integrals over real orbitals: the one-body tensor is
+    symmetric, :math:`h_{pq} = h_{qp}`, and the two-body tensor is symmetric within
+    each of its index pairs, :math:`h_{pqrs} = h_{qprs} = h_{pqsr}`. These assumptions
+    are not checked, and the result is incorrect if they don't hold. Symmetrizing the
+    two-body tensor under exchange of its index pairs, as in
+    ``0.5 * (h + h.transpose(2, 3, 0, 1))``, does not change the operator it
+    represents. Real tensors that lack the other symmetries can be converted to a
+    complex data type.
+
     Args:
         two_body_tensor: The two-body tensor.
         norb: The number of spatial orbitals.
