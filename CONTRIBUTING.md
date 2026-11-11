@@ -1,5 +1,15 @@
 # Developer guide
 
+## AI policy
+
+You can use generative AI tools like large language models (LLMs) to contribute to ffsim, subject to the following rules:
+
+- You must understand and be able to explain the code you submit.
+- You must disclose if you made significant use of AI to create your pull request.
+- You must not use AI to automatically submit issues, pull requests, or comments. All interactions with developers must be driven by a human.
+
+We will reject pull requests and close issues that we deem to be AI slop.
+
 ## Setup
 
 To set up ffsim for development, install it from source in editable mode along with the development requirements:
