@@ -46,7 +46,10 @@ class FermionOperator(MutableMapping[tuple[tuple[bool, bool, int], ...], complex
     def __pow__(self, other: int) -> FermionOperator: ...
 
 def apply_phase_shift_in_place(
-    vec: np.ndarray, phase: complex, indices: np.ndarray
+    vec: np.ndarray,
+    phase: complex,
+    row_indices: np.ndarray | None = None,
+    col_indices: np.ndarray | None = None,
 ) -> None: ...
 def apply_givens_rotation_in_place(
     vec: np.ndarray, c: float, s: complex, slice1: np.ndarray, slice2: np.ndarray
