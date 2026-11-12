@@ -22,6 +22,7 @@ import pytest
 import scipy.sparse.linalg
 
 import ffsim
+from ffsim._lib import apply_phase_shift_in_place
 
 RNG = np.random.default_rng(122876587820755543368795580021809321038)
 
@@ -457,6 +458,97 @@ def test_apply_num_op_prod(norb: int, nelec: tuple[int, int]):
                 eig = 0
             expected = np.exp(1j * eig) * vec
             np.testing.assert_allclose(result, expected)
+
+
+@pytest.mark.parametrize(
+    "norb, nelec", ffsim.testing.generate_norb_nelec(exhaustive=False)
+)
+def test_apply_num_op_prod_random_state(norb: int, nelec: tuple[int, int]):
+    """Test number operator product interaction on a random state."""
+    dim = ffsim.dim(norb, nelec)
+    vec = ffsim.random.random_state_vector(dim, seed=RNG)
+    strings_a, strings_b = map(
+        np.asarray,
+        ffsim.addresses_to_strings(
+            range(dim), norb=norb, nelec=nelec, concatenate=False
+        ),
+    )
+    theta = RNG.uniform(-10, 10)
+    # Target sets may be empty on either side, and may contain more orbitals
+    # than there are electrons of that spin
+    for n_a, n_b in itertools.product(range(min(norb, 3) + 1), repeat=2):
+        alpha_orbs = list(RNG.choice(norb, size=n_a, replace=False))
+        beta_orbs = list(RNG.choice(norb, size=n_b, replace=False))
+        mask_a = sum(1 << int(i) for i in alpha_orbs)
+        mask_b = sum(1 << int(i) for i in beta_orbs)
+        selected = ((strings_a & mask_a) == mask_a) & ((strings_b & mask_b) == mask_b)
+        expected = np.where(selected, np.exp(1j * theta), 1) * vec
+        original = vec.copy()
+        result = ffsim.apply_num_op_prod_interaction(
+            vec, theta, target_orbs=(alpha_orbs, beta_orbs), norb=norb, nelec=nelec
+        )
+        np.testing.assert_allclose(result, expected)
+        np.testing.assert_array_equal(vec, original)
+
+
+def test_apply_num_op_prod_strided_in_place():
+    """Test number operator product interaction in-place on a strided vector."""
+    norb = 4
+    nelec = (2, 2)
+    dim = ffsim.dim(norb, nelec)
+    buf = ffsim.random.random_state_vector(2 * dim, seed=RNG)
+    # The reshaped view of a strided vector is not C-contiguous
+    vec = buf[::2]
+    theta = RNG.uniform(-10, 10)
+    target_orbs = ([0], [1])
+    expected = ffsim.apply_num_op_prod_interaction(
+        vec.copy(), theta, target_orbs=target_orbs, norb=norb, nelec=nelec
+    )
+    result = ffsim.apply_num_op_prod_interaction(
+        vec, theta, target_orbs=target_orbs, norb=norb, nelec=nelec, copy=False
+    )
+    np.testing.assert_allclose(result, expected)
+    np.testing.assert_allclose(vec, expected)
+
+
+@pytest.mark.parametrize("shape", [(1000, 400), (100_000, 1), (1, 100_000), (7, 5)])
+@pytest.mark.parametrize("layout", ["C", "F", "strided"])
+def test_apply_phase_shift_in_place(shape: tuple[int, int], layout: str):
+    """Test phase shift kernel on a submatrix."""
+    n_rows, n_cols = shape
+    # Large enough shapes reach the parallel code path, and the F-ordered and
+    # strided layouts reach the non-contiguous fallback
+    for row_sel, col_sel in itertools.product([None, "subset", "empty"], repeat=2):
+        if layout == "strided":
+            base = RNG.standard_normal((n_rows, 2 * n_cols)).astype(complex)
+            mat = base[:, ::2]
+        else:
+            mat = RNG.standard_normal((n_rows, n_cols)).astype(complex)
+            if layout == "F":
+                mat = np.asfortranarray(mat)
+        row_indices = _random_indices(n_rows, row_sel, sort=True)
+        col_indices = _random_indices(n_cols, col_sel, sort=False)
+        phase = np.exp(1j * RNG.uniform(-np.pi, np.pi))
+        expected = mat.copy()
+        if row_indices is not None and col_indices is not None:
+            expected[np.ix_(row_indices, col_indices)] *= phase
+        else:
+            rows = slice(None) if row_indices is None else row_indices
+            cols = slice(None) if col_indices is None else col_indices
+            expected[rows, cols] *= phase
+        apply_phase_shift_in_place(mat, phase, row_indices, col_indices)
+        np.testing.assert_allclose(mat, expected)
+
+
+def _random_indices(n: int, selection: str | None, sort: bool) -> np.ndarray | None:
+    if selection is None:
+        return None
+    if selection == "empty":
+        return np.array([], dtype=np.uintp)
+    indices = RNG.choice(n, size=max(1, n // 2), replace=False)
+    if sort:
+        indices.sort()
+    return indices.astype(np.uintp)
 
 
 @pytest.mark.parametrize("norb, spin", ffsim.testing.generate_norb_spin(range(4)))
