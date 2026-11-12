@@ -21,6 +21,7 @@ import scipy.sparse.linalg
 from pyscf.fci.direct_nosym import contract_1e
 
 from ffsim._cistring import gen_linkstr_index
+from ffsim._dtype import as_double_precision
 
 
 def contract_one_body(
@@ -44,6 +45,8 @@ def contract_one_body(
     Returns:
         A LinearOperator that implements the action of the one-body tensor.
     """
+    vec = as_double_precision(vec)
+    mat = as_double_precision(mat)
     n_alpha, n_beta = nelec
     link_index_a = gen_linkstr_index(range(norb), n_alpha)
     link_index_b = gen_linkstr_index(range(norb), n_beta)

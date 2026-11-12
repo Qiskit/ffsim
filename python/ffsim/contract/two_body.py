@@ -37,6 +37,7 @@ from scipy.sparse.linalg import LinearOperator
 
 from ffsim import states
 from ffsim._cistring import gen_linkstr_index, gen_linkstr_index_trilidx
+from ffsim._dtype import as_double_precision
 
 
 def two_body_linop(
@@ -117,6 +118,7 @@ def _two_body_linop_real(
     )
 
     def matvec(vec: np.ndarray):
+        vec = as_double_precision(vec)
         result = contract_2e_spin1(
             two_body_tensor, vec, norb, nelec, link_index=link_index
         )
@@ -149,6 +151,7 @@ def _two_body_linop_complex(
     )
 
     def matvec(vec: np.ndarray):
+        vec = as_double_precision(vec)
         result = contract_2e_nosym(
             two_body_tensor, vec, norb, nelec, link_index=link_index
         )
@@ -157,6 +160,7 @@ def _two_body_linop_complex(
         return result
 
     def rmatvec(vec: np.ndarray):
+        vec = as_double_precision(vec)
         result = contract_2e_nosym(
             two_body_tensor.transpose(1, 0, 3, 2).conj(),
             vec,
@@ -248,6 +252,7 @@ def two_body_linop_unrestricted(
     )
 
     def matvec(vec: np.ndarray):
+        vec = as_double_precision(vec)
         # Unlike direct_spin1.contract_2e, direct_uhf.contract_2e does not handle
         # complex vectors, so the real and imaginary parts are contracted separately.
         if np.iscomplexobj(vec):
