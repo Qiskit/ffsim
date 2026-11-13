@@ -20,12 +20,14 @@ import numpy as np
 
 from ffsim import gates, protocols
 from ffsim.linalg.util import rows_and_cols, upper_triangular_indices
+from ffsim.serialization import _register_serializable
 from ffsim.variational.givens import GivensAnsatzOp
 from ffsim.variational.num_num import NumNumAnsatzOpSpinBalanced
 from ffsim.variational.ucj_spin_balanced import UCJOpSpinBalanced
 from ffsim.variational.util import validate_interaction_pairs
 
 
+@_register_serializable(name="ffsim.UCJAnglesOpSpinBalanced")
 @dataclass(frozen=True)
 class UCJAnglesOpSpinBalanced(
     protocols.SupportsApplyUnitary, protocols.SupportsApproximateEquality

@@ -34,6 +34,7 @@ from ffsim.linalg.util import (
     unitary_to_parameters,
     upper_triangular_indices,
 )
+from ffsim.serialization import _register_serializable
 from ffsim.variational.util import (
     orbital_rotation_from_t1_amplitudes,
     validate_interaction_pairs,
@@ -41,6 +42,7 @@ from ffsim.variational.util import (
 )
 
 
+@_register_serializable(name="ffsim.UCJOpSpinUnbalanced")
 @dataclass(frozen=True)
 class UCJOpSpinUnbalanced(
     protocols.SupportsApplyUnitary, protocols.SupportsApproximateEquality

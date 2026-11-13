@@ -26,9 +26,11 @@ from ffsim.linalg.double_factorized_decomposition import (
     modified_cholesky,
 )
 from ffsim.operators import FermionOperator
+from ffsim.serialization import _register_serializable
 from ffsim.states.dimensions import dim
 
 
+@_register_serializable(name="ffsim.SingleFactorizedHamiltonian")
 @dataclasses.dataclass(frozen=True)
 class SingleFactorizedHamiltonian(
     protocols.SupportsApproximateEquality,

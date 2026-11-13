@@ -13,23 +13,20 @@
 """The MolecularData class.
 
 The MolecularData class stores molecular integrals, geometry, energies, and other data.
-It can be saved to and loaded from JSON (lossless) and FCIDUMP (integrals only) formats.
+It can be saved to and loaded from JSON (lossless), using :func:`ffsim.to_json` and
+:func:`ffsim.from_json`, and FCIDUMP (integrals only) formats.
 """
 
 from __future__ import annotations
 
-import bz2
 import dataclasses
-import gzip
-import lzma
 import os
 import tempfile
+import warnings
 from collections.abc import Iterable
 from functools import cached_property
-from typing import Callable
 
 import numpy as np
-import orjson
 import pyscf
 import pyscf.cc
 import pyscf.ci
@@ -39,8 +36,10 @@ import pyscf.mp
 import pyscf.tools
 
 from ffsim.hamiltonians import MolecularHamiltonian
+from ffsim.serialization import _register_serializable, from_json, to_json
 
 
+@_register_serializable(name="ffsim.MolecularData")
 @dataclasses.dataclass(kw_only=True)
 class MolecularData:
     """Class for storing molecular data."""
@@ -60,8 +59,9 @@ class MolecularData:
     # Molecule information corresponding to attributes of pyscf.gto.Mole
     atom: list[tuple[str, list[float]]] | None = None
     """The coordinates of the atoms in the molecule."""
-    basis: str | None = None
-    """The basis set, e.g. ``"sto-6g"``."""
+    basis: str | dict | None = None
+    """The basis set, e.g. ``"sto-6g"``, or a dictionary mapping elements to basis sets
+    as accepted by PySCF, e.g. ``{"O": "sto-6g", "H": "sto-3g"}``."""
     spin: int | None = None
     """The spin of the molecule."""
     symmetry: str | None = None
@@ -256,56 +256,56 @@ class MolecularData:
     ) -> None:
         """Serialize to JSON format, optionally compressed, and save to disk.
 
+        .. warning::
+            This method is deprecated. Use :func:`ffsim.to_json` instead.
+
         Args:
             file: The file path to save to.
             compression: The optional compression algorithm to use.
                 Options: ``"gzip"``, ``"bz2"``, ``"lzma"``.
         """
-
-        def default(obj):
-            if isinstance(obj, np.ndarray):
-                return np.ascontiguousarray(obj)
-            raise TypeError
-
-        open_func: dict[str | None, Callable] = {
-            None: open,
-            "gzip": gzip.open,
-            "bz2": bz2.open,
-            "lzma": lzma.open,
-        }
-
-        for attribute in ["hamiltonian", "mole", "scf"]:
-            try:
-                delattr(self, attribute)
-            except AttributeError:
-                pass
-        with open_func[compression](file, "wb") as f:
-            f.write(
-                orjson.dumps(self, option=orjson.OPT_SERIALIZE_NUMPY, default=default)
-            )
+        warnings.warn(
+            "MolecularData.to_json is deprecated. Use ffsim.to_json instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        to_json(self, file, compression=compression)
 
     @staticmethod
     def from_json(
-        file: str | bytes | os.PathLike, compression: str | None = None
+        file: str | bytes | os.PathLike, compression: str | None = "infer"
     ) -> MolecularData:
         """Load a MolecularData from a (possibly compressed) JSON file.
 
+        .. warning::
+            This method is deprecated. Use :func:`ffsim.from_json` instead.
+
+        Files written by earlier versions of ffsim are also supported.
+
         Args:
             file: The file path to read from.
-            compression: The compression algorithm, if any, which was used to compress
-                the file.
-                Options: ``"gzip"``, ``"bz2"``, ``"lzma"``.
+            compression: The compression algorithm that was used to compress the
+                file: ``"gzip"``, ``"bz2"``, ``"lzma"``, or ``None`` for no
+                compression. The default, ``"infer"``, detects it from the file's
+                contents.
 
         Returns: The MolecularData object.
         """
-        open_func: dict[str | None, Callable] = {
-            None: open,
-            "gzip": gzip.open,
-            "bz2": bz2.open,
-            "lzma": lzma.open,
-        }
-        with open_func[compression](file, "rb") as f:
-            data = orjson.loads(f.read())
+        warnings.warn(
+            "MolecularData.from_json is deprecated. Use ffsim.from_json instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return from_json(file, compression=compression)
+
+    @staticmethod
+    def _from_json_legacy_(data: dict) -> MolecularData:
+        """Reconstruct a MolecularData written by ffsim 0.0.86 or earlier.
+
+        Those versions dumped the dataclass directly to JSON, storing arrays as nested
+        lists without recording their dtype, so arrays are recovered by inference rather
+        than exactly.
+        """
 
         def as_array_or_none(val):
             if val is None:

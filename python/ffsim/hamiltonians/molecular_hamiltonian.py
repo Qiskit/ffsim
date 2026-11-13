@@ -25,11 +25,13 @@ from ffsim import protocols
 from ffsim.contract.two_body import two_body_linop, two_body_linop_unrestricted
 from ffsim.linalg.util import rotate_one_body_tensor, rotate_two_body_tensor
 from ffsim.operators import FermionAction, FermionOperator, cre_a, cre_b, des_a, des_b
+from ffsim.serialization import _register_serializable
 
 _Coeffs = dict[tuple[tuple[bool, bool, int], ...], complex]
 """The mapping from terms to coefficients that a FermionOperator is built from."""
 
 
+@_register_serializable(name="ffsim.MolecularHamiltonian")
 @dataclasses.dataclass(frozen=True)
 class MolecularHamiltonian(
     protocols.SupportsApproximateEquality,
@@ -288,6 +290,7 @@ class MolecularHamiltonian(
         return NotImplemented
 
 
+@_register_serializable(name="ffsim.MolecularHamiltonianSpinless")
 @dataclasses.dataclass(frozen=True)
 class MolecularHamiltonianSpinless(
     protocols.SupportsApproximateEquality,
@@ -497,6 +500,7 @@ class MolecularHamiltonianSpinless(
         return NotImplemented
 
 
+@_register_serializable(name="ffsim.MolecularHamiltonianUnrestricted")
 @dataclasses.dataclass(frozen=True)
 class MolecularHamiltonianUnrestricted(
     protocols.SupportsApproximateEquality,
