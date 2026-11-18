@@ -798,7 +798,7 @@ requires-dist = [
     { name = "numpy" },
     { name = "opt-einsum" },
     { name = "orjson" },
-    { name = "pyscf", specifier = ">=2.15" },
+    { name = "pyscf", specifier = ">=2.15,!=2.15.1" },
     { name = "qiskit", marker = "extra == 'qiskit'", specifier = ">=2.0,<3" },
     { name = "scipy" },
 ]

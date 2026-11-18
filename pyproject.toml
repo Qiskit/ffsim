@@ -27,7 +27,9 @@ dependencies = [
     "numpy",
     "opt_einsum",
     "orjson",
-    "pyscf>=2.15",
+    # PySCF 2.15.1 has no macOS arm64 wheel and its sdist fails to build
+    # (https://github.com/pyscf/pyscf/issues/3656)
+    "pyscf>=2.15,!=2.15.1",
     "scipy",
 ]
 
