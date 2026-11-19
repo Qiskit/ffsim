@@ -242,8 +242,8 @@ def _make_backend_cmap_pygraph(
 
     # remove bad edges
     edge_list = backend_coupling_graph.edge_list()
-    for gate in two_q_gate_names:
-        for edge in edge_list:
+    for edge in edge_list:
+        for gate in two_q_gate_names:
             if edge in target[gate]:
                 found_edge = edge
             else:
@@ -255,6 +255,7 @@ def _make_backend_cmap_pygraph(
 
             if gate_prop.error >= two_qubit_error_threshold:
                 backend_coupling_graph.remove_edge(edge[0], edge[1])
+                break
 
     return backend_coupling_graph
 

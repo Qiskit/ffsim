@@ -17,10 +17,11 @@ from typing import Literal, cast
 import pytest
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.providers.fake_provider import GenericBackendV2
-from qiskit.transpiler import CouplingMap
+from qiskit.transpiler import CouplingMap, InstructionProperties
 
 import ffsim
 from ffsim.qiskit import generate_lucj_pass_manager
+from ffsim.qiskit.lucj_pass_manager import _make_backend_cmap_pygraph
 
 cmap_square = CouplingMap.from_grid(num_rows=12, num_columns=10)
 backend_square = GenericBackendV2(
@@ -170,6 +171,41 @@ def test_backend_with_none_noise_info():
     )
 
     assert allowed_alpha_beta_pairs
+
+
+@pytest.mark.filterwarnings("ignore:Backend cannot accommodate")
+def test_edge_bad_for_every_two_qubit_gate():
+    """Test an edge whose error exceeds the threshold for two two-qubit gates."""
+    backend = GenericBackendV2(
+        num_qubits=cmap_heavy_hex.size(),
+        coupling_map=cmap_heavy_hex,
+        basis_gates=["cz", "rzz", "id", "rz", "sx", "x"],
+        noise_info=True,
+        seed=0,
+    )
+    bad_edge = (0, 121)
+    for gate in ["cz", "rzz"]:
+        for qargs in [bad_edge, bad_edge[::-1]]:
+            backend.target.update_instruction_properties(
+                gate, qargs, InstructionProperties(error=1.0)
+            )
+
+    graph = _make_backend_cmap_pygraph(
+        backend=backend, two_qubit_error_threshold=1.0, readout_error_threshold=1.0
+    )
+    assert not graph.has_edge(*bad_edge)
+    num_edges = len({frozenset(edge) for edge in cmap_heavy_hex.get_edges()})
+    assert graph.num_edges() == num_edges - 1
+
+    pairs_aa = [(p, p + 1) for p in range(norb - 1)]
+    _, allowed_pairs_ab = generate_lucj_pass_manager(
+        backend=backend,
+        norb=norb,
+        connectivity="heavy-hex",
+        interaction_pairs=(pairs_aa, None),
+        optimization_level=1,
+    )
+    assert allowed_pairs_ab
 
 
 @pytest.mark.parametrize(
