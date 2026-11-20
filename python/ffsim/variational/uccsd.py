@@ -24,6 +24,7 @@ import scipy.sparse.linalg
 
 from ffsim import contract, gates, linalg, operators, protocols
 from ffsim.linalg.util import unitary_from_parameters, unitary_to_parameters
+from ffsim.serialization import _register_serializable
 from ffsim.variational.util import (
     validate_t2_antisymmetric,
     validate_t2_pair_symmetric,
@@ -152,6 +153,7 @@ def _antisymmetric_t2_to_values(t2: np.ndarray) -> np.ndarray:
     )
 
 
+@_register_serializable(name="ffsim.UCCSDOpRestrictedReal")
 @dataclass(frozen=True)
 class UCCSDOpRestrictedReal(
     protocols.SupportsApplyUnitary, protocols.SupportsApproximateEquality
@@ -392,6 +394,7 @@ class UCCSDOpRestrictedReal(
         return NotImplemented
 
 
+@_register_serializable(name="ffsim.UCCSDOpRestricted")
 @dataclass(frozen=True)
 class UCCSDOpRestricted(
     protocols.SupportsApplyUnitary, protocols.SupportsApproximateEquality
@@ -621,6 +624,7 @@ class UCCSDOpRestricted(
         return NotImplemented
 
 
+@_register_serializable(name="ffsim.UCCSDOpUnrestrictedReal")
 @dataclass(frozen=True)
 class UCCSDOpUnrestrictedReal(
     protocols.SupportsApplyUnitary, protocols.SupportsApproximateEquality
@@ -955,6 +959,7 @@ class UCCSDOpUnrestrictedReal(
         return NotImplemented
 
 
+@_register_serializable(name="ffsim.UCCSDOpUnrestricted")
 @dataclass(frozen=True)
 class UCCSDOpUnrestricted(
     protocols.SupportsApplyUnitary, protocols.SupportsApproximateEquality
@@ -1287,6 +1292,7 @@ class UCCSDOpUnrestricted(
         return NotImplemented
 
 
+@_register_serializable(name="ffsim.UCCSDOpSpinlessReal")
 @dataclass(frozen=True)
 class UCCSDOpSpinlessReal(
     protocols.SupportsApplyUnitary, protocols.SupportsApproximateEquality
@@ -1513,6 +1519,7 @@ class UCCSDOpSpinlessReal(
         return NotImplemented
 
 
+@_register_serializable(name="ffsim.UCCSDOpSpinless")
 @dataclass(frozen=True)
 class UCCSDOpSpinless(
     protocols.SupportsApplyUnitary, protocols.SupportsApproximateEquality

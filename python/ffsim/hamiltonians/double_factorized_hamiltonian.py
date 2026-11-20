@@ -24,9 +24,11 @@ from ffsim.contract.num_op_sum import num_op_sum_linop
 from ffsim.hamiltonians.molecular_hamiltonian import MolecularHamiltonian
 from ffsim.linalg import double_factorized, double_factorized_compressed
 from ffsim.operators import FermionOperator
+from ffsim.serialization import _register_serializable
 from ffsim.states.dimensions import dim
 
 
+@_register_serializable(name="ffsim.DoubleFactorizedHamiltonian")
 @dataclasses.dataclass(frozen=True)
 class DoubleFactorizedHamiltonian(
     protocols.SupportsApproximateEquality,

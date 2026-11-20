@@ -5,6 +5,7 @@
 
 sample-from-state-vectors
 compute-expectation-values
+save-and-load-objects
 simulate-vqe
 simulate-trotter-mol-ham
 simulate-trotter-hubbard

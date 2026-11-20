@@ -35,12 +35,14 @@ from pyscf.fci.rdm import make_dm123, make_dm1234, reorder_dm123, reorder_dm1234
 
 from ffsim._cistring import gen_linkstr_index
 from ffsim.linalg.util import rotate_one_body_tensor, rotate_two_body_tensor
+from ffsim.serialization import _register_serializable
 from ffsim.states.states import spinful_to_spinless_vec
 
 if TYPE_CHECKING:
     from ffsim.hamiltonians.molecular_hamiltonian import MolecularHamiltonian
 
 
+@_register_serializable(name="ffsim.ReducedDensityMatrix")
 @dataclasses.dataclass
 class ReducedDensityMatrix:
     """Class to store one- and two-body reduced density matrices."""
